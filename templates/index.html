@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valorização | Painel Corporativo</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        /* =====================================================
+           ESCALA PROPORCIONAL À TELA
+           Tudo é medido em "rem" e o rem acompanha o tamanho
+           da tela. Assim o painel ocupa a TV inteira, seja o
+           navegador dela 1920x1080, 1280x720 ou 960x540.
+           Base: 1rem = 16px numa tela 1920x1080.
+        ====================================================== */
+        html {
+            font-size: 16px;                      /* navegadores muito antigos */
+            font-size: 0.8333vw;                  /* 1920 / 120 = 16px */
+        }
+
+        @supports (font-size: min(1vw, 1vh)) {
+            html {
+                /* não deixa estourar a altura em telas mais "baixas" */
+                font-size: min(0.8333vw, 1.4815vh);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; }
+
+        :root {
+            --primaria:        #e67317;
+            --primaria-claro:  #f0a04b;
+            --primaria-escuro: #b85510;
+            --ambar:           #d99b52;
+
+            --borda-fraca:     rgba(217, 155, 82, 0.12);
+            --borda-media:     rgba(217, 155, 82, 0.26);
+
+            --texto:           #f2f3f5;
+            --texto-medio:     #a8afbc;
+            --texto-fraco:     #6b7280;
+
+            --verde:           #4ade80;
+            --vermelho:        #ff7676;
+        }
+
+        body {
+            font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+            background:
+                radial-gradient(ellipse 75rem 38rem at 10% -10%, rgba(230, 115, 23, 0.12), transparent 55%),
+                radial-gradient(ellipse 62rem 31rem at 90% 110%, rgba(217, 155, 82, 0.08), transparent 55%),
+                linear-gradient(180deg, #0b0c0f 0%, #0e1015 100%);
+            color: var(--texto);
+            overflow: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background-image:
+                linear-gradient(rgba(217, 155, 82, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(217, 155, 82, 0.03) 1px, transparent 1px);
+            background-size: 3.5rem 3.5rem;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* =====================================================
+           ESTRUTURA: header / main / footer ocupando 100% da tela
+        ====================================================== */
+        .app {
+            position: relative;
+            z-index: 1;
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-rows: 5.5rem 1fr 2.25rem;
+            overflow: hidden;
+        }
+
+        /* =====================================================
+           HEADER
+        ====================================================== */
+        header {
+            position: relative;
+            z-index: 100;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(230, 115, 23, 0.28);
+            background:
+                radial-gradient(ellipse 44rem 12rem at 50% 0%, rgba(255, 255, 255, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 56rem 19rem at 50% 50%, rgba(230, 115, 23, 0.10) 0%, transparent 75%),
+                linear-gradient(90deg, #0a0a0c 0%, #1a1a1e 25%, #2a2a30 50%, #1a1a1e 75%, #0a0a0c 100%);
+            box-shadow: 0 0.5rem 1.9rem rgba(0, 0, 0, 0.6);
+        }
+
+        header::after {
+            content: "";
+            position: absolute;
+            left: 0; right: 0; bottom: -1px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(230, 115, 23, 0.6) 30%,
+                        rgba(240, 160, 75, 0.9) 50%, rgba(230, 115, 23, 0.6) 70%, transparent 100%);
+            box-shadow: 0 0 1rem rgba(230, 115, 23, 0.35);
+        }
+
+        .brand {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            display: flex;
+            align-items: center;
+            transform: translate(-50%, -50%);
+            animation: brandVaiVolta 40s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            z-index: 3;
+        }
+
+        @keyframes brandVaiVolta {
+            0%   { transform: translate(calc(-50% + 120vw), -50%); opacity: 0; }
+            2%   { opacity: 1; }
+            5%   { transform: translate(-50%, -50%); opacity: 1; }
+            25%  { transform: translate(-50%, -50%); }
+            30%  { transform: translate(calc(-50% - 120vw), -50%); }
+            35%  { transform: translate(calc(-50% - 120vw), -50%); }
+            40%  { transform: translate(-50%, -50%); }
+            100% { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
+        .brand-icon {
+            width: 4.6rem;
+            height: 4.6rem;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            filter: drop-shadow(0 0.4rem 1.1rem rgba(230, 115, 23, 0.45));
+        }
+
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .brand-icon i { color: var(--primaria); font-size: 2.2rem; }
+
+        .brand-title {
+            font-size: 1.45rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            white-space: nowrap;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ffffff 0%, var(--primaria-claro) 50%, var(--primaria) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            margin-top: 0.2rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #c4c9d2;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            white-space: nowrap;
+        }
+
+        .header-right {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 4;
+        }
+
+        .clock-box {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.8rem;
+            background: rgba(20, 20, 24, 0.85);
+            border: 1px solid rgba(230, 115, 23, 0.25);
+        }
+
+        .clock-box i {
+            color: var(--primaria-claro);
+            font-size: 1.1rem;
+            margin-right: 0.8rem;
+        }
+
+        .clock-time {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            color: #ffffff;
+        }
+
+        .clock-divider {
+            width: 1px;
+            height: 1.5rem;
+            margin: 0 0.9rem;
+            background: rgba(230, 115, 23, 0.35);
+        }
+
+        .clock-date {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #c4c9d2;
+        }
+
+        /* =====================================================
+           MAIN
+           Carrossel à esquerda, Agenda das Salas à direita
+           (agenda agora com ~42% da largura).
+           O aviso em destaque (card1), se existir, fica embaixo.
+        ====================================================== */
+        main {
+            min-height: 0;
+            padding: 1.25rem 1.6rem;
+            display: grid;
+            grid-template-rows: 1fr auto;
+            grid-gap: 1.25rem;
+            gap: 1.25rem;
+            overflow: hidden;
+        }
+
+        .top-row {
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 1.38fr 1fr;
+            grid-gap: 1.25rem;
+            gap: 1.25rem;
+        }
+
+        #avisoUnicoContainer { min-height: 0; }
+
+        /* =====================================================
+           PAINEL (card base)
+        ====================================================== */
+        .panel {
+            position: relative;
+            min-height: 0;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+            border-radius: 1.3rem;
+            border: 1px solid var(--borda-fraca);
+            background: linear-gradient(160deg, rgba(30, 34, 42, 0.88) 0%, rgba(17, 19, 24, 0.96) 100%);
+            box-shadow: 0 1.5rem 4.4rem rgba(0, 0, 0, 0.55);
+        }
+
+        .panel-header {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.3rem;
+            border-bottom: 1px solid var(--borda-fraca);
+            background: linear-gradient(90deg, rgba(230, 115, 23, 0.09) 0%, rgba(23, 26, 32, 0.6) 55%, transparent 100%);
+        }
+
+        .panel-header-icon {
+            width: 2.4rem;
+            height: 2.4rem;
+            margin-right: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 0.65rem;
+            background: linear-gradient(140deg, var(--primaria), var(--primaria-claro));
+            color: #ffffff;
+            font-size: 1rem;
+            box-shadow: 0 0.4rem 1rem rgba(230, 115, 23, 0.4);
+        }
+
+        .panel-header-text { flex: 1; min-width: 0; }
+
+        .panel-header-title {
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .panel-header-sub {
+            margin-top: 0.15rem;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--texto-fraco);
+        }
+
+        /* =====================================================
+           CARROSSEL
+        ====================================================== */
+        .carousel-panel { background: #000000; }
+
+        .carousel {
+            position: relative;
+            min-height: 0;
+            overflow: hidden;
+            background: #000000;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000000;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(1.06) translateX(2rem);
+            /* sem filter/blur: em TV isso deixa o vídeo preto */
+            transition:
+                opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0.8s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateX(0);
+            z-index: 2;
+        }
+
+        .slide.leaving-left  { opacity: 0; visibility: hidden; transform: scale(1.04) translateX(-2.5rem); z-index: 1; }
+        .slide.leaving-right { opacity: 0; visibility: hidden; transform: scale(1.04) translateX(2.5rem);  z-index: 1; }
+        .slide.entering-right { opacity: 0; visibility: hidden; transform: scale(1.06) translateX(2.5rem); }
+        .slide.entering-left  { opacity: 0; visibility: hidden; transform: scale(1.06) translateX(-2.5rem); }
+
+        /* Slides de vídeo: só opacidade, nenhum transform */
+        .slide.slide-video,
+        .slide.slide-video.active,
+        .slide.slide-video.leaving-left,
+        .slide.slide-video.leaving-right,
+        .slide.slide-video.entering-left,
+        .slide.slide-video.entering-right {
+            transform: none;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .slide-media {
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+            overflow: hidden;
+        }
+
+        .slide img,
+        .slide video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000000;
+            border: 0;
+            outline: none;
+        }
+
+        .slide img { transform: scale(1.02); transition: transform 8s ease-out; }
+        .slide.active img { transform: scale(1.06); }
+
+        .slide-overlay {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            z-index: 10;
+            padding: 5rem 2rem 3.2rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.96), rgba(0, 0, 0, 0.6), transparent);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(1.2rem);
+            transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s;
+        }
+
+        .slide.active .slide-overlay { opacity: 1; transform: translateY(0); }
+
+        .slide-title {
+            font-size: 2rem;
+            line-height: 1.15;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0.2rem 0.9rem rgba(0, 0, 0, 0.7);
+        }
+
+        .slide-description {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            max-width: 92%;
+            color: rgba(255, 255, 255, 0.88);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            left: 50%;
+            bottom: 1rem;
+            transform: translateX(-50%);
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(11, 12, 15, 0.7);
+            border: 1px solid var(--borda-fraca);
+        }
+
+        .carousel-dot {
+            width: 0.6rem;
+            height: 0.6rem;
+            margin: 0 0.25rem;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            cursor: pointer;
+            transition: all 0.35s ease;
+        }
+
+        .carousel-dot.active {
+            width: 1.7rem;
+            border-radius: 0.6rem;
+            background: linear-gradient(90deg, var(--primaria), var(--primaria-claro));
+            box-shadow: 0 0 0.9rem rgba(230, 115, 23, 0.7);
+        }
+
+        /* =====================================================
+           COLUNA DIREITA: Atendimento (em cima) + Agenda (embaixo)
+        ====================================================== */
+        .side-col {
+            min-height: 0;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            grid-gap: 1.25rem;
+            gap: 1.25rem;
+        }
+
+        .side-col.sem-atendimento { grid-template-rows: 1fr; }
+        .side-col.sem-atendimento .attend-panel { display: none; }
+
+        /* =====================================================
+           CARD DE ATENDIMENTO (Messenger em tempo real)
+        ====================================================== */
+        .attend-panel {
+            grid-template-rows: auto auto;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .attend-panel .panel-header { padding: 0.8rem 1.4rem; }
+        .attend-panel .panel-header-title { font-size: 1.15rem; }
+
+        .attend-live {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            color: var(--texto-medio);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .attend-live::before {
+            content: "";
+            width: 0.5rem;
+            height: 0.5rem;
+            margin-right: 0.45rem;
+            border-radius: 50%;
+            background: var(--texto-fraco);
+        }
+
+        .attend-live.on { color: var(--verde); border-color: rgba(74, 222, 128, 0.35); }
+        .attend-live.on::before {
+            background: var(--verde);
+            box-shadow: 0 0 0.6rem var(--verde);
+            animation: piscar 1.6s ease-in-out infinite;
+        }
+
+        @keyframes piscar {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.25; }
+        }
+
+        .attend-body {
+            min-height: 8.8rem;
+            padding: 1rem 1.4rem;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            grid-column-gap: 1.4rem;
+            column-gap: 1.4rem;
+            align-items: center;
+        }
+
+        .attend-big {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 7rem;
+            height: 7rem;
+            border-radius: 1.1rem;
+            background: rgba(74, 222, 128, 0.10);
+            border: 1px solid rgba(74, 222, 128, 0.30);
+            color: var(--verde);
+        }
+
+        .attend-big-num {
+            font-size: 3.4rem;
+            font-weight: 900;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .attend-big-label {
+            margin-top: 0.3rem;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .attend-big i { font-size: 2.8rem; }
+
+        .attend-info { min-width: 0; }
+
+        .attend-titulo {
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .attend-sub {
+            margin-top: 0.35rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--texto-medio);
+        }
+
+        .attend-lista { display: grid; grid-gap: 0.45rem; gap: 0.45rem; }
+
+        .attend-cliente {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.6rem;
+            background: rgba(230, 115, 23, 0.10);
+            border: 1px solid rgba(230, 115, 23, 0.25);
+        }
+
+        .attend-cliente-nome {
+            flex: 0 1 auto;
+            min-width: 0;
+            font-size: 1.1rem;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .attend-cliente-nome i { color: var(--primaria-claro); margin-right: 0.5rem; }
+
+        .attend-cliente-esq {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .attend-cliente { min-width: 0; }
+        .attend-lista { min-width: 0; }
+
+        .attend-depto {
+            flex-shrink: 0;
+            margin-left: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+        }
+
+        .attend-cliente-espera {
+            flex-shrink: 0;
+            margin-left: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primaria-claro);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .attend-cliente-espera.demorado { color: var(--vermelho); }
+
+        .attend-mais {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--texto-medio);
+            padding-left: 0.3rem;
+        }
+
+        /* --- CLIENTE AGUARDANDO: card laranja --- */
+        .attend-panel.alerta {
+            border-color: rgba(230, 115, 23, 0.75);
+            box-shadow:
+                0 1.5rem 4.4rem rgba(0, 0, 0, 0.55),
+                0 0 2.5rem rgba(230, 115, 23, 0.30);
+            animation: alertaBorda 2s ease-in-out infinite;
+        }
+
+        .attend-panel.alerta .attend-big {
+            background: linear-gradient(140deg, var(--primaria), var(--primaria-escuro));
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: 0 0.5rem 1.5rem rgba(230, 115, 23, 0.5);
+        }
+
+        @keyframes alertaBorda {
+            0%, 100% { box-shadow: 0 1.5rem 4.4rem rgba(0,0,0,0.55), 0 0 1.2rem rgba(230,115,23,0.25); }
+            50%      { box-shadow: 0 1.5rem 4.4rem rgba(0,0,0,0.55), 0 0 3.2rem rgba(230,115,23,0.60); }
+        }
+
+        /* cliente NOVO chegou: flash */
+        .attend-panel.chegou { animation: chegou 0.5s ease-in-out 6; }
+
+        @keyframes chegou {
+            0%, 100% { background-color: transparent; }
+            50%      { background-color: rgba(230, 115, 23, 0.35); }
+        }
+
+        /* sem conexão / login expirado */
+        .attend-panel.offline .attend-big {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: var(--texto-fraco);
+        }
+
+        .attend-panel.login .attend-big {
+            background: rgba(255, 118, 118, 0.10);
+            border-color: rgba(255, 118, 118, 0.35);
+            color: var(--vermelho);
+        }
+
+        /* =====================================================
+           AGENDA DAS SALAS  (maior e mais legível à distância)
+        ====================================================== */
+        .rooms-panel {
+            background: linear-gradient(160deg, rgba(30, 34, 42, 0.92) 0%, rgba(11, 12, 15, 0.98) 100%);
+        }
+
+        .rooms-panel .panel-header { padding: 1rem 1.4rem; }
+
+        .rooms-panel .panel-header-icon {
+            width: 2.8rem;
+            height: 2.8rem;
+            font-size: 1.2rem;
+        }
+
+        .rooms-panel .panel-header-title { font-size: 1.3rem; }
+        .rooms-panel .panel-header-sub   { font-size: 0.9rem; }
+
+        .rooms-count {
+            flex-shrink: 0;
+            margin-left: 0.8rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--primaria-claro);
+            background: rgba(230, 115, 23, 0.12);
+            border: 1px solid rgba(230, 115, 23, 0.35);
+            white-space: nowrap;
+        }
+
+        .rooms-body {
+            position: relative;
+            min-height: 0;
+            padding: 1rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;           /* sem barra de rolagem na TV */
+        }
+
+        .rooms-body::-webkit-scrollbar { width: 0; height: 0; }
+
+        .rooms-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-gap: 0.75rem;
+            gap: 0.75rem;
+        }
+
+        /* Cada reunião */
+        .room-item {
+            position: relative;
+            display: grid;
+            grid-template-columns: 3.6rem 1fr auto;
+            grid-column-gap: 1rem;
+            column-gap: 1rem;
+            align-items: center;
+            padding: 0.7rem 1.1rem;
+            border-radius: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+        }
+
+        /* Reunião de HOJE fica em destaque */
+        .room-item.hoje {
+            border-color: rgba(230, 115, 23, 0.55);
+            background: linear-gradient(135deg, rgba(230, 115, 23, 0.16), rgba(255, 255, 255, 0.02));
+            box-shadow: 0 0 1.5rem rgba(230, 115, 23, 0.12);
+        }
+
+        .room-item.hoje::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 18%; bottom: 18%;
+            width: 0.3rem;
+            border-radius: 0 0.3rem 0.3rem 0;
+            background: linear-gradient(180deg, var(--primaria-claro), var(--primaria-escuro));
+        }
+
+        .room-item.passada { opacity: 0.55; }
+
+        .room-date {
+            width: 3.6rem;
+            height: 3.6rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.8rem;
+            color: #ffffff;
+            box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.35);
+        }
+
+        .room-date-dia {
+            font-size: 1.45rem;
+            font-weight: 900;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .room-date-mes {
+            margin-top: 0.15rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .room-date.cor-0 { background: linear-gradient(140deg, #22c55e, #15803d); }
+        .room-date.cor-1 { background: linear-gradient(140deg, #3b82f6, #1e40af); }
+        .room-date.cor-2 { background: linear-gradient(140deg, #f97316, #c2410c); }
+        .room-date.cor-3 { background: linear-gradient(140deg, #a855f7, #6d28d9); }
+        .room-date.cor-4 { background: linear-gradient(140deg, #ef4444, #b91c1c); }
+        .room-date.cor-5 { background: linear-gradient(140deg, #14b8a6, #0f766e); }
+
+        .room-info { min-width: 0; }
+
+        .room-name {
+            font-size: 1.25rem;
+            font-weight: 800;
+            line-height: 1.25;
+            color: var(--texto);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .room-meta {
+            margin-top: 0.3rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        .room-meta span {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .room-meta i {
+            margin-right: 0.4rem;
+            color: var(--primaria-claro);
+            font-size: 0.9rem;
+        }
+
+        .room-meta .room-hora {
+            color: var(--primaria-claro);
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .room-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .room-tag-hoje {
+            margin-bottom: 0.35rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            color: #ffffff;
+            background: linear-gradient(140deg, var(--primaria), var(--primaria-claro));
+        }
+
+        .room-status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .room-status-pill::before {
+            content: "";
+            width: 0.45rem;
+            height: 0.45rem;
+            margin-right: 0.45rem;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 0.6rem currentColor;
+        }
+
+        .room-status-pill.disponivel { background: rgba(74, 222, 128, 0.10); color: var(--verde);    border: 1px solid rgba(74, 222, 128, 0.30); }
+        .room-status-pill.ocupada    { background: rgba(255, 118, 118, 0.10); color: var(--vermelho); border: 1px solid rgba(255, 118, 118, 0.30); }
+        .room-status-pill.reservada  { background: rgba(217, 155, 82, 0.12); color: var(--ambar);    border: 1px solid rgba(217, 155, 82, 0.35); }
+
+        /* =====================================================
+           AVISO EM DESTAQUE (card1)
+        ====================================================== */
+        .aviso-full {
+            position: relative;
+            height: 15rem;
+            display: grid;
+            grid-template-columns: 26rem 1fr;
+            overflow: hidden;
+            border-radius: 1.3rem;
+            border: 1px solid var(--borda-fraca);
+            background: linear-gradient(135deg, rgba(30, 34, 42, 0.9) 0%, rgba(17, 19, 24, 0.98) 100%);
+            box-shadow: 0 1.5rem 4.4rem rgba(0, 0, 0, 0.55);
+        }
+
+        .aviso-full::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 0.25rem;
+            background: linear-gradient(180deg, var(--primaria), var(--primaria-claro), var(--primaria-escuro));
+            z-index: 5;
+        }
+
+        .aviso-full-media {
+            position: relative;
+            background: #000000;
+            overflow: hidden;
+        }
+
+        .aviso-full-media img,
+        .aviso-full-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .aviso-full-body {
+            padding: 1.6rem 2.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .aviso-full-tag {
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: linear-gradient(140deg, var(--primaria), var(--primaria-claro));
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .aviso-full-tag i { margin-right: 0.5rem; }
+
+        .aviso-full-title {
+            margin-top: 0.9rem;
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .aviso-full-desc {
+            margin-top: 0.6rem;
+            font-size: 1.15rem;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.8);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* =====================================================
+           ESTADO VAZIO / DEBUG / FOOTER
+        ====================================================== */
+        .empty-state {
+            width: 100%;
+            height: 100%;
+            min-height: 10rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--texto-medio);
+        }
+
+        .empty-state i {
+            font-size: 2.6rem;
+            color: var(--primaria);
+            opacity: 0.7;
+            margin-bottom: 0.9rem;
+        }
+
+        .empty-state span { font-size: 1.05rem; font-weight: 600; }
+
+        /* abrir com  http://IP:5000/?debug=1 */
+        #debugTv {
+            position: fixed;
+            left: 0.6rem;
+            bottom: 0.6rem;
+            max-width: 46vw;
+            max-height: 40vh;
+            overflow: hidden;
+            z-index: 9999;
+            padding: 0.5rem 0.7rem;
+            border-radius: 0.5rem;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid var(--primaria);
+            color: #9effa0;
+            font: 0.8rem/1.35 monospace;
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 2rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.02em;
+            color: var(--texto-fraco);
+            border-top: 1px solid var(--borda-fraca);
+            background: linear-gradient(90deg, transparent, rgba(217, 155, 82, 0.04), transparent);
+        }
+
+        /* =====================================================
+           TELA EM PÉ (TV na vertical, tablet, celular)
+           Carrossel em cima e agenda embaixo, com rolagem.
+        ====================================================== */
+        @media (orientation: portrait) {
+            html { font-size: 2.1vw; }
+
+            body { overflow: auto; }
+
+            .app {
+                height: auto;
+                min-height: 100vh;
+                grid-template-rows: 5rem auto auto;
+                overflow: visible;
+            }
+
+            main {
+                grid-template-rows: auto auto;
+                overflow: visible;
+            }
+
+            .top-row { grid-template-columns: 1fr; }
+
+            .carousel { height: 56vw; }          /* proporção 16:9 */
+
+            .rooms-body { max-height: none; overflow: visible; }
+
+            .aviso-full {
+                height: auto;
+                grid-template-columns: 1fr;
+            }
+
+            .aviso-full-media { height: 56vw; }
+
+            .brand-title { font-size: 1.3rem; }
+            .clock-date, .clock-divider { display: none; }
+            footer { padding: 1rem; }
+        }
+
+        @media (orientation: portrait) and (max-width: 600px) {
+            html { font-size: 3.4vw; }
+            .brand-subtitle { display: none; }
+            .brand-title { font-size: 1.05rem; }
+            .brand-icon { width: 3.2rem; height: 3.2rem; margin-right: 0.6rem; }
+            .header-right { right: 1rem; }
+            .clock-box i { display: none; }
+            .room-item { grid-template-columns: 3.2rem 1fr; }
+            .room-side {
+                grid-column: 2;
+                flex-direction: row;
+                align-items: center;
+                margin-top: 0.5rem;
+            }
+            .room-tag-hoje { margin: 0 0.5rem 0 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .slide, .slide img, .slide-overlay, .brand {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header>
+        <div class="brand">
+            <div class="brand-icon">
+                <img
+                    src="/static/avisos/logo.png"
+                    alt="Valorização Assessoria Contábil"
+                    onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-bullhorn\'></i>';"
+                >
+            </div>
+            <div class="brand-text">
+                <div class="brand-title">Valorização Assessoria Contábil</div>
+                <div class="brand-subtitle">Painel Corporativo</div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="clock-box">
+                <i class="fa-regular fa-clock"></i>
+                <span class="clock-time" id="clockTime">--:--</span>
+                <span class="clock-divider"></span>
+                <span class="clock-date" id="clockDate">--/--/----</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <section class="top-row">
+
+            <!-- CARROSSEL -->
+            <div class="panel carousel-panel">
+                <div class="panel-header">
+                    <div class="panel-header-icon"><i class="fa-solid fa-film"></i></div>
+                    <div class="panel-header-text">
+                        <div class="panel-header-title">Avisos</div>
+                        <div class="panel-header-sub">Comunicações internas</div>
+                    </div>
+                </div>
+
+                <div class="carousel" id="carousel"></div>
+
+                <div class="carousel-dots" id="carouselDots"></div>
+            </div>
+
+            <!-- COLUNA DIREITA -->
+            <div class="side-col sem-atendimento" id="sideCol">
+
+                <!-- ATENDIMENTO EM TEMPO REAL -->
+                <div class="panel attend-panel offline" id="attendPanel">
+                    <div class="panel-header">
+                        <div class="panel-header-icon"><i class="fa-solid fa-headset"></i></div>
+                        <div class="panel-header-text">
+                            <div class="panel-header-title">Atendimento</div>
+                            <div class="panel-header-sub">Messenger · tempo real</div>
+                        </div>
+                        <div class="attend-live" id="attendLive">CONECTANDO</div>
+                    </div>
+                    <div class="attend-body" id="attendBody"></div>
+                </div>
+
+                <!-- AGENDA DAS SALAS -->
+                <div class="panel rooms-panel">
+                    <div class="panel-header">
+                        <div class="panel-header-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                        <div class="panel-header-text">
+                            <div class="panel-header-title">Agenda das Salas</div>
+                            <div class="panel-header-sub">Reuniões e reservas</div>
+                        </div>
+                        <div class="rooms-count" id="roomsCount">0 reuniões</div>
+                    </div>
+
+                    <div class="rooms-body" id="roomsBody"></div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="avisoUnicoContainer"></section>
+
+    </main>
+
+    <footer>
+        Valorização Assessoria Contábil
+        &nbsp;•&nbsp;
+        Departamento de TI
+        &nbsp;•&nbsp;
+        Wallace Silvano Miguel
+    </footer>
+
+</div>
+
+<div id="debugTv"></div>
+
+<script>
+
+    /* =========================================================
+       PAINEL DE AVISOS - VERSÃO COMPATÍVEL COM SMART TV
+
+       O que mudou no carrossel (motivo do vídeo não passar na TV):
+       1. Só existe UM <video> na página por vez. Ele é criado quando
+          o slide entra e destruído quando sai. TVs têm 1 decodificador
+          de vídeo; com vários <video preload="auto"> ao mesmo tempo o
+          navegador da TV simplesmente não toca nenhum.
+       2. Se a TV bloquear o autoplay ou o vídeo travar/der erro, o
+          carrossel NÃO fica parado: pula para o próximo aviso.
+       3. O vídeo tenta tocar de novo quando os dados chegam
+          (loadedmetadata / canplay) - várias TVs ignoram o 1º play().
+       4. Sem blur/filter nos slides de vídeo (CSS).
+       5. Modo diagnóstico: abra  http://IP-DO-PC:5000/?debug=1  na TV
+          para ver na tela o que está acontecendo com o vídeo.
+    ========================================================== */
+
+    var avisos = [];
+    var salas = [];
+    var configuracoes = {};
+
+    var avisosCarrossel = [];
+    var avisoCard = null;
+
+    var currentSlide = 0;
+    var slideTimer = null;
+    var painelAnterior = "";
+
+    var videoAtual = null;          // único <video> ativo do carrossel
+    var vigiaVideo = null;          // intervalo que detecta travamento
+    var sessaoSlide = 0;            // evita eventos de vídeos antigos
+
+    var TEMPO_IMAGEM = 6000;        // imagem fica 6 s
+    var TEMPO_SEM_AUTOPLAY = 10000; // se a TV bloquear o play, pula após 10 s
+    var TEMPO_TRAVADO = 15000;      // vídeo sem avançar 15 s -> pula
+    var INTERVALO_ATUALIZACAO = 5000;
+
+    /* ---------------------------------------------------------
+       DIAGNÓSTICO NA TELA (?debug=1)
+    --------------------------------------------------------- */
+    var DEBUG = /[?&]debug=1/.test(window.location.search);
+    var linhasDebug = [];
+
+    function log(msg) {
+        var hora = new Date().toTimeString().slice(0, 8);
+        var linha = hora + "  " + msg;
+        try { console.log(linha); } catch (e) {}
+        if (!DEBUG) return;
+        linhasDebug.push(linha);
+        if (linhasDebug.length > 14) linhasDebug.shift();
+        var box = document.getElementById("debugTv");
+        if (box) {
+            box.style.display = "block";
+            box.textContent = linhasDebug.join("\n");
+        }
+    }
+
+    /* ---------------------------------------------------------
+       RELÓGIO
+    --------------------------------------------------------- */
+    function doisDigitos(n) {
+        n = String(n);
+        return n.length < 2 ? "0" + n : n;
+    }
+
+    function atualizarRelogio() {
+        var agora = new Date();
+        var elTime = document.getElementById("clockTime");
+        var elDate = document.getElementById("clockDate");
+
+        if (elTime) {
+            elTime.textContent =
+                doisDigitos(agora.getHours()) + ":" +
+                doisDigitos(agora.getMinutes());
+        }
+        if (elDate) {
+            elDate.textContent =
+                doisDigitos(agora.getDate()) + "/" +
+                doisDigitos(agora.getMonth() + 1) + "/" +
+                String(agora.getFullYear()).slice(-2);
+        }
+    }
+
+    setInterval(atualizarRelogio, 1000);
+    atualizarRelogio();
+
+    /* ---------------------------------------------------------
+       HELPERS
+    --------------------------------------------------------- */
+    function texto(valor) {
+        if (valor === null || valor === undefined) return "";
+        return String(valor).trim();
+    }
+
+    function extensao(nome) {
+        var a = texto(nome).toLowerCase().split("?")[0];
+        var p = a.lastIndexOf(".");
+        return p >= 0 ? a.slice(p) : "";
+    }
+
+    function ehVideo(nome) {
+        var ext = extensao(nome);
+        return ext === ".mp4" || ext === ".m4v" || ext === ".webm" ||
+               ext === ".ogg" || ext === ".ogv" || ext === ".mov";
+    }
+
+    function tipoMimeVideo(nome) {
+        var ext = extensao(nome);
+        if (ext === ".webm") return "video/webm";
+        if (ext === ".ogg" || ext === ".ogv") return "video/ogg";
+        return "video/mp4"; // .mp4 .m4v .mov (H.264)
+    }
+
+    function avisoEhVideo(aviso) {
+        if (!aviso) return false;
+        if (texto(aviso.tipo) === "video") return true;
+        return ehVideo(aviso.imagem || aviso.arquivo || "");
+    }
+
+    function obterUrlMidia(aviso) {
+        if (aviso.media_url && texto(aviso.media_url)) return aviso.media_url;
+        if (aviso.imagem && texto(aviso.imagem)) {
+            return "/avisos/" + encodeURIComponent(texto(aviso.imagem));
+        }
+        if (aviso.arquivo && texto(aviso.arquivo)) {
+            return "/avisos/" + encodeURIComponent(texto(aviso.arquivo));
+        }
+        return "";
+    }
+
+    function escapeHtml(valor) {
+        return String(valor)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    /* ---------------------------------------------------------
+       VÍDEO: criar / tocar / destruir
+    --------------------------------------------------------- */
+    function criarElementoVideo(url, nomeArquivo, emLoop) {
+        var video = document.createElement("video");
+
+        // "muted" precisa estar ANTES do src para o autoplay ser liberado
+        video.muted = true;
+        video.defaultMuted = true;
+        video.setAttribute("muted", "");
+        video.setAttribute("autoplay", "");
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+        video.setAttribute("preload", "auto");
+        video.setAttribute("disableRemotePlayback", "");
+        video.autoplay = true;
+        video.playsInline = true;
+        video.controls = false;
+        video.loop = !!emLoop;
+
+        var source = document.createElement("source");
+        source.src = url;
+        source.type = tipoMimeVideo(nomeArquivo);
+        video.appendChild(source);
+
+        return video;
+    }
+
+    function destruirVideo(video) {
+        if (!video) return;
+        video._destruido = true;
+        try { video.pause(); } catch (e) {}
+        try {
+            // libera o decodificador de hardware da TV
+            video.removeAttribute("src");
+            var fontes = video.querySelectorAll("source");
+            for (var i = 0; i < fontes.length; i++) {
+                fontes[i].removeAttribute("src");
+            }
+            video.load();
+        } catch (e) {}
+        if (video.parentNode) video.parentNode.removeChild(video);
+    }
+
+    function tentarTocar(video, sessao) {
+        if (!video || sessao !== sessaoSlide) return;
+        video.muted = true;
+        var p;
+        try {
+            p = video.play();
+        } catch (e) {
+            log("play() falhou: " + e.message);
+            return;
+        }
+        if (p && typeof p.then === "function") {
+            p.then(function () {
+                if (sessao === sessaoSlide) log("tocando");
+            }).catch(function (erro) {
+                if (sessao !== sessaoSlide || video._destruido) return;
+                log("play recusado: " + (erro && erro.name));
+            });
+        }
+    }
+
+    function pararVigia() {
+        if (vigiaVideo) {
+            clearInterval(vigiaVideo);
+            vigiaVideo = null;
+        }
+    }
+
+    function limparTimer() {
+        if (slideTimer) {
+            clearTimeout(slideTimer);
+            slideTimer = null;
+        }
+    }
+
+    function encerrarVideoAtual() {
+        pararVigia();
+        if (videoAtual) {
+            destruirVideo(videoAtual);
+            videoAtual = null;
+        }
+    }
+
+    function iniciarVideoNoSlide(slide, aviso, sessao) {
+        var media = slide.querySelector(".slide-media");
+        if (!media) return;
+
+        var url = obterUrlMidia(aviso);
+        var nome = aviso.imagem || aviso.arquivo || "";
+        var video = criarElementoVideo(url, nome, false);
+        videoAtual = video;
+
+        var ultimoTempo = -1;
+        var ultimoAvanco = Date.now();
+        var comecou = false;
+        var inicio = Date.now();
+        var jaPulou = false;
+
+        // true = este vídeo já saiu da tela (ignorar eventos dele)
+        function antigo() {
+            return sessao !== sessaoSlide || video._destruido;
+        }
+
+        function pular(motivo) {
+            if (antigo() || jaPulou) return;
+            jaPulou = true;
+            log("pulando vídeo: " + motivo);
+            nextSlide();
+        }
+
+        video.addEventListener("loadedmetadata", function () {
+            if (antigo()) return;
+            log("metadata ok " + video.videoWidth + "x" + video.videoHeight +
+                " dur=" + Math.round(video.duration || 0) + "s");
+            tentarTocar(video, sessao);
+        });
+
+        video.addEventListener("canplay", function () {
+            if (antigo()) return;
+            if (video.paused) tentarTocar(video, sessao);
+        });
+
+        video.addEventListener("playing", function () {
+            comecou = true;
+        });
+
+        video.addEventListener("ended", function () {
+            pular("terminou");
+        });
+
+        video.addEventListener("error", function () {
+            if (antigo()) return;
+            var codigo = video.error ? video.error.code : "?";
+            log("ERRO no vídeo (code " + codigo + ") " + url);
+            setTimeout(function () { pular("erro"); }, 1500);
+        }, true);
+
+        // erro na <source> (arquivo não encontrado / formato não suportado)
+        var src = video.querySelector("source");
+        if (src) {
+            src.addEventListener("error", function () {
+                if (antigo()) return;
+                log("ERRO ao carregar " + url + " (formato/arquivo)");
+                setTimeout(function () { pular("source erro"); }, 1500);
+            });
+        }
+
+        media.appendChild(video);
+
+        try { video.load(); } catch (e) {}
+        tentarTocar(video, sessao);
+
+        // Vigia: se a TV bloquear o autoplay ou o vídeo travar,
+        // o carrossel continua rodando.
+        pararVigia();
+        vigiaVideo = setInterval(function () {
+            if (sessao !== sessaoSlide) { pararVigia(); return; }
+
+            var agora = Date.now();
+            var t = video.currentTime || 0;
+
+            if (t !== ultimoTempo) {
+                ultimoTempo = t;
+                ultimoAvanco = agora;
+            }
+
+            if (!comecou && agora - inicio > TEMPO_SEM_AUTOPLAY) {
+                if (video.paused) tentarTocar(video, sessao);
+                if (agora - inicio > TEMPO_SEM_AUTOPLAY + 5000) {
+                    pular("não iniciou (autoplay bloqueado ou formato)");
+                }
+                return;
+            }
+
+            if (comecou && agora - ultimoAvanco > TEMPO_TRAVADO) {
+                pular("travado " + Math.round(t) + "s");
+                return;
+            }
+
+            // segurança extra: duração conhecida + 10 s
+            if (video.duration && isFinite(video.duration) &&
+                agora - inicio > (video.duration * 1000) + 10000 + TEMPO_SEM_AUTOPLAY) {
+                pular("passou da duração");
+            }
+        }, 1000);
+    }
+
+    /* ---------------------------------------------------------
+       CARROSSEL
+    --------------------------------------------------------- */
+    function transicionarSlides(novoIndex, direcao) {
+        var slides = document.querySelectorAll("#carousel .slide");
+        if (!slides.length) return;
+
+        var anterior = currentSlide;
+        var i;
+
+        for (i = 0; i < slides.length; i++) {
+            slides[i].classList.remove("leaving-left", "leaving-right",
+                                      "entering-left", "entering-right");
+        }
+
+        if (slides[anterior] && anterior !== novoIndex) {
+            slides[anterior].classList.remove("active");
+            slides[anterior].classList.add(direcao > 0 ? "leaving-left" : "leaving-right");
+        }
+
+        currentSlide = novoIndex;
+
+        var novo = slides[novoIndex];
+        if (novo) {
+            novo.classList.add(direcao > 0 ? "entering-right" : "entering-left");
+            void novo.offsetWidth;
+            novo.classList.remove("entering-right", "entering-left");
+            novo.classList.add("active");
+        }
+
+        var dots = document.querySelectorAll("#carouselDots .carousel-dot");
+        for (i = 0; i < dots.length; i++) {
+            if (i === currentSlide) dots[i].classList.add("active");
+            else dots[i].classList.remove("active");
+        }
+    }
+
+    function showSlide(index) {
+        if (!avisosCarrossel.length) return;
+
+        limparTimer();
+        encerrarVideoAtual();   // sempre libera o vídeo anterior
+
+        if (index < 0) index = avisosCarrossel.length - 1;
+        if (index >= avisosCarrossel.length) index = 0;
+
+        var direcao = index >= currentSlide ? 1 : -1;
+        transicionarSlides(index, direcao);
+
+        sessaoSlide++;
+        var sessao = sessaoSlide;
+
+        var aviso = avisosCarrossel[currentSlide];
+        var slide = document.querySelector('#carousel .slide[data-index="' + currentSlide + '"]');
+
+        if (aviso && slide && avisoEhVideo(aviso)) {
+            log("slide " + (currentSlide + 1) + ": vídeo " + (aviso.imagem || aviso.arquivo));
+            pararManterAcordada();   // libera o decodificador para o aviso
+            iniciarVideoNoSlide(slide, aviso, sessao);
+        } else {
+            log("slide " + (currentSlide + 1) + ": imagem");
+            iniciarManterAcordada();
+            slideTimer = setTimeout(function () {
+                if (sessao === sessaoSlide) nextSlide();
+            }, TEMPO_IMAGEM);
+        }
+    }
+
+    function nextSlide() {
+        if (!avisosCarrossel.length) return;
+        showSlide(currentSlide + 1);
+    }
+
+    function previousSlide() {
+        if (!avisosCarrossel.length) return;
+        showSlide(currentSlide - 1);
+    }
+
+    function goToSlide(index) {
+        showSlide(index);
+    }
+
+    function renderCarousel() {
+        var carousel = document.getElementById("carousel");
+        var dots = document.getElementById("carouselDots");
+        if (!carousel || !dots) return;
+
+        limparTimer();
+        encerrarVideoAtual();
+        sessaoSlide++;
+
+        carousel.innerHTML = "";
+        dots.innerHTML = "";
+
+        if (!avisosCarrossel.length) {
+            carousel.innerHTML =
+                '<div class="empty-state">' +
+                    '<i class="fa-solid fa-bullhorn"></i>' +
+                    '<span>Nenhum aviso no carrossel</span>' +
+                '</div>';
+            iniciarManterAcordada();
+            return;
+        }
+
+        avisosCarrossel.forEach(function (aviso, index) {
+            var slide = document.createElement("div");
+            slide.className = "slide";
+            slide.setAttribute("data-index", index);
+
+            var titulo = texto(aviso.titulo);
+            var descricao = texto(aviso.descricao);
+            var mediaUrl = obterUrlMidia(aviso);
+            var isVideo = avisoEhVideo(aviso);
+
+            var media = document.createElement("div");
+            media.className = "slide-media";
+
+            if (isVideo) {
+                // o <video> só é criado quando o slide ficar ativo
+                slide.classList.add("slide-video");
+            } else {
+                var img = document.createElement("img");
+                img.src = mediaUrl;
+                img.alt = titulo || "Aviso Valorização";
+                media.appendChild(img);
+            }
+
+            slide.appendChild(media);
+
+            if (titulo || descricao) {
+                var overlay = document.createElement("div");
+                overlay.className = "slide-overlay";
+
+                if (titulo) {
+                    var t = document.createElement("div");
+                    t.className = "slide-title";
+                    t.textContent = titulo;
+                    overlay.appendChild(t);
+                }
+
+                if (descricao) {
+                    var d = document.createElement("div");
+                    d.className = "slide-description";
+                    d.textContent = descricao;
+                    overlay.appendChild(d);
+                }
+
+                slide.appendChild(overlay);
+            }
+
+            carousel.appendChild(slide);
+
+            var dot = document.createElement("button");
+            dot.type = "button";
+            dot.className = "carousel-dot";
+            dot.setAttribute("aria-label", "Ir para aviso " + (index + 1));
+            dot.addEventListener("click", function () { goToSlide(index); });
+            dots.appendChild(dot);
+        });
+
+        currentSlide = 0;
+        showSlide(0);
+    }
+
+    /* ---------------------------------------------------------
+       SALAS
+    --------------------------------------------------------- */
+    function obterStatusSala(sala) {
+        var status = texto(sala.status).toUpperCase();
+        if (status === "OCUPADA") return "ocupada";
+        if (status === "RESERVADA") return "reservada";
+        return "disponivel";
+    }
+
+    function obterRotuloStatus(status) {
+        if (status === "ocupada") return "Ocupada";
+        if (status === "reservada") return "Reservada";
+        return "Disponível";
+    }
+
+    var MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN",
+                 "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+
+    // "29/09/2026" -> Date (ou null)
+    function lerDataBr(valor) {
+        var m = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/.exec(texto(valor));
+        if (!m) return null;
+        var ano = Number(m[3]);
+        if (ano < 100) ano += 2000;
+        return new Date(ano, Number(m[2]) - 1, Number(m[1]));
+    }
+
+    function hojeSemHora() {
+        var h = new Date();
+        return new Date(h.getFullYear(), h.getMonth(), h.getDate());
+    }
+
+    function renderRooms() {
+        var container = document.getElementById("roomsBody");
+        var contador = document.getElementById("roomsCount");
+        if (!container) return;
+
+        pararRolagemSalas();
+        container.innerHTML = "";
+        container.scrollTop = 0;
+
+        if (contador) {
+            contador.textContent = salas.length + (salas.length === 1 ? " reunião" : " reuniões");
+        }
+
+        if (!salas.length) {
+            container.innerHTML =
+                '<div class="empty-state">' +
+                    '<i class="fa-solid fa-door-closed"></i>' +
+                    '<span>Nenhuma reunião agendada</span>' +
+                '</div>';
+            return;
+        }
+
+        var hoje = hojeSemHora().getTime();
+        var lista = document.createElement("div");
+        lista.className = "rooms-list";
+
+        salas.forEach(function (sala, index) {
+            var nome = texto(sala.nome) || texto(sala.sala) || ("Sala " + (index + 1));
+            var status = obterStatusSala(sala);
+            var rotulo = obterRotuloStatus(status);
+
+            var responsavel = texto(sala.responsavel);
+            var horaInicial = texto(sala.hora_inicial_fmt) || texto(sala.horainicial) || texto(sala.hora_inicial);
+            var horaFinal = texto(sala.hora_final_fmt) || texto(sala.horafinal) || texto(sala.hora_final);
+            var dataFormatada = texto(sala.data_formatada) || texto(sala.data);
+            var data = lerDataBr(dataFormatada);
+
+            var ehHoje = !!(data && data.getTime() === hoje);
+            var passou = !!(data && data.getTime() < hoje);
+
+            // bloco da data (dia grande + mês)
+            var blocoData;
+            if (data) {
+                blocoData =
+                    '<div class="room-date-dia">' + doisDigitos(data.getDate()) + '</div>' +
+                    '<div class="room-date-mes">' + MESES[data.getMonth()] + '</div>';
+            } else {
+                blocoData = '<div class="room-date-dia">' + doisDigitos(index + 1) + '</div>';
+            }
+
+            // linha de detalhes: horário • responsável
+            var meta = "";
+            if (horaInicial) {
+                meta += '<span class="room-hora"><i class="fa-regular fa-clock"></i>' +
+                        escapeHtml(horaInicial) +
+                        (horaFinal ? " – " + escapeHtml(horaFinal) : "") +
+                        '</span>';
+            }
+            if (responsavel) {
+                meta += '<span><i class="fa-regular fa-user"></i>' + escapeHtml(responsavel) + '</span>';
+            }
+            if (!data && dataFormatada) {
+                meta += '<span><i class="fa-regular fa-calendar"></i>' + escapeHtml(dataFormatada) + '</span>';
+            }
+            if (!meta) {
+                meta = '<span style="color: rgba(255,255,255,0.5);">Sem detalhes</span>';
+            }
+
+            var item = document.createElement("div");
+            item.className = "room-item" + (ehHoje ? " hoje" : "") + (passou ? " passada" : "");
+            item.innerHTML =
+                '<div class="room-date cor-' + (index % 6) + '">' + blocoData + '</div>' +
+                '<div class="room-info">' +
+                    '<div class="room-name">' + escapeHtml(nome) + '</div>' +
+                    '<div class="room-meta">' + meta + '</div>' +
+                '</div>' +
+                '<div class="room-side">' +
+                    (ehHoje ? '<span class="room-tag-hoje">HOJE</span>' : '') +
+                    '<span class="room-status-pill ' + status + '">' + rotulo + '</span>' +
+                '</div>';
+
+            lista.appendChild(item);
+        });
+
+        container.appendChild(lista);
+
+        // espera o navegador desenhar para medir a altura
+        setTimeout(iniciarRolagemSalas, 800);
+    }
+
+    /* ---------------------------------------------------------
+       ROLAGEM AUTOMÁTICA DA AGENDA
+       Na TV não dá para rolar com o mouse: se as reuniões não
+       couberem no card, a lista desce devagar, espera no fim e
+       volta para o topo.
+    --------------------------------------------------------- */
+    var rolagemSalas = null;
+    var pausaSalas = null;
+
+    function pararRolagemSalas() {
+        if (rolagemSalas) { clearInterval(rolagemSalas); rolagemSalas = null; }
+        if (pausaSalas) { clearTimeout(pausaSalas); pausaSalas = null; }
+    }
+
+    function iniciarRolagemSalas() {
+        var box = document.getElementById("roomsBody");
+        if (!box) return;
+        pararRolagemSalas();
+
+        if (box.scrollHeight - box.clientHeight < 4) return; // tudo coube
+
+        var passo = Math.max(1, Math.round(box.clientHeight / 400));
+
+        function descer() {
+            rolagemSalas = setInterval(function () {
+                var antes = box.scrollTop;
+                box.scrollTop = antes + passo;
+                if (box.scrollTop === antes ||
+                    box.scrollTop + box.clientHeight >= box.scrollHeight - 1) {
+                    clearInterval(rolagemSalas);
+                    rolagemSalas = null;
+                    pausaSalas = setTimeout(function () {
+                        box.scrollTop = 0;
+                        pausaSalas = setTimeout(descer, 4000);
+                    }, 4000);
+                }
+            }, 40);
+        }
+
+        pausaSalas = setTimeout(descer, 4000);
+    }
+
+    window.addEventListener("resize", function () {
+        setTimeout(iniciarRolagemSalas, 500);
+    });
+
+    /* ---------------------------------------------------------
+       AVISO EM DESTAQUE (card1)
+    --------------------------------------------------------- */
+    var videoCard = null;
+
+    function renderAvisoUnico() {
+        var container = document.getElementById("avisoUnicoContainer");
+        if (!container) return;
+
+        if (videoCard) {
+            destruirVideo(videoCard);
+            videoCard = null;
+        }
+        container.innerHTML = "";
+
+        if (!avisoCard) {
+            container.style.display = "none";
+            return;
+        }
+
+        container.style.display = "";
+
+        var aviso = avisoCard;
+        var titulo = texto(aviso.titulo) || "Aviso";
+        var descricao = texto(aviso.descricao);
+        var mediaUrl = obterUrlMidia(aviso);
+
+        var card = document.createElement("article");
+        card.className = "aviso-full";
+
+        var media = document.createElement("div");
+        media.className = "aviso-full-media";
+
+        if (avisoEhVideo(aviso)) {
+            // Obs.: muitas TVs só tocam 1 vídeo por vez. Se o destaque
+            // também for vídeo, prefira usar imagem no card.
+            videoCard = criarElementoVideo(mediaUrl, aviso.imagem || aviso.arquivo || "", true);
+            pararManterAcordada();   // o vídeo do destaque já mantém a TV acordada
+            media.appendChild(videoCard);
+            try { videoCard.load(); } catch (e) {}
+            try {
+                var p = videoCard.play();
+                if (p && p.catch) p.catch(function () {});
+            } catch (e) {}
+        } else {
+            var img = document.createElement("img");
+            img.src = mediaUrl;
+            img.alt = titulo;
+            media.appendChild(img);
+        }
+
+        card.appendChild(media);
+
+        var body = document.createElement("div");
+        body.className = "aviso-full-body";
+        body.innerHTML =
+            '<span class="aviso-full-tag">' +
+                '<i class="fa-solid fa-bullhorn"></i> Aviso em Destaque' +
+            '</span>' +
+            '<div class="aviso-full-title">' + escapeHtml(titulo) + '</div>' +
+            (descricao ? '<div class="aviso-full-desc">' + escapeHtml(descricao) + '</div>' : '');
+
+        card.appendChild(body);
+        container.appendChild(card);
+    }
+
+    /* ---------------------------------------------------------
+       DIVISÃO DOS AVISOS
+    --------------------------------------------------------- */
+    function dividirAvisos() {
+        avisosCarrossel = [];
+        avisoCard = null;
+
+        avisos.forEach(function (aviso) {
+            var pos = texto(aviso.posicao).toLowerCase();
+            if ((pos === "card1" || pos === "card") && !avisoCard) {
+                avisoCard = aviso;
+            } else {
+                avisosCarrossel.push(aviso);
+            }
+        });
+    }
+
+    /* ---------------------------------------------------------
+       CARREGAR DADOS
+       Só redesenha o que mudou - assim o vídeo que está passando
+       não é reiniciado quando só a agenda das salas muda.
+    --------------------------------------------------------- */
+    var assinaturaAvisos = "";
+    var assinaturaSalas = "";
+
+    function carregarPainel(forcar) {
+        var url = "/api/painel?t=" + Date.now();
+
+        return fetch(url, { cache: "no-store" })
+            .then(function (resposta) {
+                if (!resposta.ok) throw new Error("HTTP " + resposta.status);
+                return resposta.json();
+            })
+            .then(function (dados) {
+                var assinatura = JSON.stringify(dados);
+                if (!forcar && assinatura === painelAnterior) return;
+                painelAnterior = assinatura;
+
+                avisos = Array.isArray(dados.avisos) ? dados.avisos : [];
+                salas = Array.isArray(dados.salas) ? dados.salas : [];
+                configuracoes = dados.configuracoes || {};
+
+                var novaAssAvisos = JSON.stringify(avisos);
+                var novaAssSalas = JSON.stringify(salas);
+
+                if (forcar || novaAssAvisos !== assinaturaAvisos) {
+                    assinaturaAvisos = novaAssAvisos;
+                    dividirAvisos();
+                    renderCarousel();
+                    renderAvisoUnico();
+                    log(avisosCarrossel.length + " aviso(s) no carrossel");
+                }
+
+                if (forcar || novaAssSalas !== assinaturaSalas) {
+                    assinaturaSalas = novaAssSalas;
+                    renderRooms();
+                }
+            })
+            .catch(function (erro) {
+                log("Erro ao carregar painel: " + erro.message);
+            });
+    }
+
+    setInterval(function () { carregarPainel(false); }, INTERVALO_ATUALIZACAO);
+
+    // quando o dia vira, redesenha a agenda para atualizar o "HOJE"
+    var diaAtual = new Date().getDate();
+    setInterval(function () {
+        var d = new Date().getDate();
+        if (d !== diaAtual) {
+            diaAtual = d;
+            renderRooms();
+        }
+    }, 60000);
+
+    document.addEventListener("keydown", function (evento) {
+        // setas do controle remoto da TV também funcionam
+        if (evento.key === "ArrowLeft" || evento.keyCode === 37) previousSlide();
+        else if (evento.key === "ArrowRight" || evento.keyCode === 39) nextSlide();
+    });
+
+    /* =========================================================
+       ATENDIMENTO EM TEMPO REAL (Messenger)
+       Os dados vêm de /api/atendimento (gerado pelo leitor_messenger.py)
+    ========================================================== */
+    var INTERVALO_ATENDIMENTO = 4000;
+    var ultimoTotalPendentes = 0;
+    var assinaturaAtendimento = "";
+    var MAX_CLIENTES_CARD = 3;
+
+    function textoEspera(min) {
+        if (!min || min < 1) return "agora";
+        if (min < 60) return "há " + min + " min";
+        var h = Math.floor(min / 60);
+        var m = min % 60;
+        return "há " + h + "h" + (m ? doisDigitos(m) : "");
+    }
+
+    function renderAtendimento(d) {
+        var side = document.getElementById("sideCol");
+        var card = document.getElementById("attendPanel");
+        var body = document.getElementById("attendBody");
+        var live = document.getElementById("attendLive");
+        if (!side || !card || !body || !live) return;
+
+        var status = d && d.status ? d.status : "sem_leitor";
+
+        var estavaOculto = side.classList.contains("sem-atendimento");
+
+        if (status === "desativado") {
+            side.classList.add("sem-atendimento");
+            if (!estavaOculto) setTimeout(iniciarRolagemSalas, 800);
+            return;
+        }
+        side.classList.remove("sem-atendimento");
+        // a agenda mudou de tamanho: recalcula a rolagem automática
+        if (estavaOculto) setTimeout(iniciarRolagemSalas, 800);
+
+        var assinatura = JSON.stringify(d);
+        if (assinatura === assinaturaAtendimento) return;
+        assinaturaAtendimento = assinatura;
+
+        card.classList.remove("alerta", "offline", "login");
+        live.className = "attend-live";
+
+        if (status === "login_necessario") {
+            card.classList.add("login");
+            live.textContent = "SEM LOGIN";
+            body.innerHTML =
+                '<div class="attend-big"><i class="fa-solid fa-lock"></i></div>' +
+                '<div class="attend-info">' +
+                    '<div class="attend-titulo">Login do Messenger expirou</div>' +
+                    '<div class="attend-sub">' + escapeHtml(texto(d.mensagem) || "Rode o login_messenger.bat no PC do painel") + '</div>' +
+                '</div>';
+            return;
+        }
+
+        if (status !== "ok") {
+            card.classList.add("offline");
+            live.textContent = "OFFLINE";
+            body.innerHTML =
+                '<div class="attend-big"><i class="fa-solid fa-plug"></i></div>' +
+                '<div class="attend-info">' +
+                    '<div class="attend-titulo">' + (status === "erro" ? "Erro no leitor do Messenger" : "Conectando ao Messenger…") + '</div>' +
+                    '<div class="attend-sub">' + escapeHtml(texto(d.mensagem) || "Verifique se o leitor do Messenger está aberto") + '</div>' +
+                '</div>';
+            return;
+        }
+
+        live.classList.add("on");
+        live.textContent = "AO VIVO";
+
+        var total = Number(d.pendentes) || 0;
+        var emAtend = d.em_atendimento;
+        var linhaAtend = (emAtend === null || emAtend === undefined) ? "" :
+            emAtend + (Number(emAtend) === 1 ? " conversa" : " conversas") + " em atendimento";
+
+        if (total === 0) {
+            body.innerHTML =
+                '<div class="attend-big"><i class="fa-solid fa-check"></i></div>' +
+                '<div class="attend-info">' +
+                    '<div class="attend-titulo">Nenhum cliente aguardando</div>' +
+                    '<div class="attend-sub">' + escapeHtml(linhaAtend) + '</div>' +
+                '</div>';
+            ultimoTotalPendentes = 0;
+            return;
+        }
+
+        card.classList.add("alerta");
+
+        var clientes = Array.isArray(d.clientes) ? d.clientes : [];
+        var html = '';
+        var mostrados = 0;
+
+        clientes.slice(0, MAX_CLIENTES_CARD).forEach(function (c) {
+            var nome = texto(c.nome) || "Cliente";
+            var min = Number(c.espera_min) || 0;
+            html +=
+                '<div class="attend-cliente">' +
+                    '<span class="attend-cliente-esq">' +
+                        '<span class="attend-cliente-nome"><i class="fa-brands fa-whatsapp"></i>' + escapeHtml(nome) + '</span>' +
+                        (texto(c.departamento) ? '<span class="attend-depto">' + escapeHtml(texto(c.departamento)) + '</span>' : '') +
+                    '</span>' +
+                    '<span class="attend-cliente-espera' + (min >= 10 ? ' demorado' : '') + '">' + textoEspera(min) + '</span>' +
+                '</div>';
+            mostrados++;
+        });
+
+        var resto = total - mostrados;
+        if (resto > 0) {
+            html += '<div class="attend-mais">+ ' + resto + (resto === 1 ? ' outro aguardando' : ' outros aguardando') + '</div>';
+        }
+        if (!mostrados) {
+            html = '<div class="attend-titulo">' +
+                   (total === 1 ? 'Cliente aguardando atendimento' : 'Clientes aguardando atendimento') +
+                   '</div><div class="attend-sub">' + escapeHtml(linhaAtend) + '</div>';
+        }
+
+        body.innerHTML =
+            '<div class="attend-big">' +
+                '<div class="attend-big-num">' + total + '</div>' +
+                '<div class="attend-big-label">aguardando</div>' +
+            '</div>' +
+            '<div class="attend-info"><div class="attend-lista">' + html + '</div></div>';
+
+        // chegou cliente novo -> pisca o card
+        if (total > ultimoTotalPendentes) {
+            card.classList.remove("chegou");
+            void card.offsetWidth;
+            card.classList.add("chegou");
+            setTimeout(function () { card.classList.remove("chegou"); }, 3200);
+            log("novo cliente aguardando: " + total);
+        }
+        ultimoTotalPendentes = total;
+    }
+
+    function carregarAtendimento() {
+        return fetch("/api/atendimento?t=" + Date.now(), { cache: "no-store" })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { renderAtendimento(d); })
+            .catch(function () { renderAtendimento({ status: "sem_leitor" }); });
+    }
+
+    setInterval(carregarAtendimento, INTERVALO_ATENDIMENTO);
+    carregarAtendimento();
+
+    /* =========================================================
+       MANTER A TV ACORDADA
+       As TVs entram em proteção de tela / espera quando nada
+       "está passando". Duas técnicas:
+       1. Wake Lock (API oficial do navegador). Só funciona em HTTPS
+          ou localhost e em navegadores novos - tentamos mesmo assim.
+       2. Um vídeo preto minúsculo (keepalive.mp4, 64x64, invisível)
+          tocando em loop enquanto o carrossel mostra IMAGENS.
+          Com vídeo tocando, a TV entende que tem mídia em reprodução
+          e não ativa a proteção de tela.
+          Quando o slide é um VÍDEO de aviso, o keepalive é destruído
+          para não disputar o decodificador da TV (o próprio aviso já
+          mantém a TV acordada).
+    ========================================================== */
+    var URL_KEEPALIVE = "/static/keepalive.mp4";
+    var videoKeepAlive = null;
+    var wakeLock = null;
+
+    function pedirWakeLock() {
+        try {
+            if (!("wakeLock" in navigator)) return;
+            if (wakeLock) return;
+            navigator.wakeLock.request("screen").then(function (lock) {
+                wakeLock = lock;
+                log("wake lock ativo");
+                lock.addEventListener("release", function () { wakeLock = null; });
+            }).catch(function () { /* http sem cadeado: não suportado */ });
+        } catch (e) {}
+    }
+
+    function iniciarManterAcordada() {
+        pedirWakeLock();
+
+        if (videoCard) return;          // card em destaque já é um vídeo tocando
+        if (videoKeepAlive) {
+            if (videoKeepAlive.paused) {
+                try {
+                    var p0 = videoKeepAlive.play();
+                    if (p0 && p0.catch) p0.catch(function () {});
+                } catch (e) {}
+            }
+            return;
+        }
+
+        var v = criarElementoVideo(URL_KEEPALIVE, "keepalive.mp4", true);
+        v.setAttribute("aria-hidden", "true");
+        v.style.position = "fixed";
+        v.style.right = "0";
+        v.style.bottom = "0";
+        v.style.width = "2px";
+        v.style.height = "2px";
+        v.style.opacity = "0.01";       // "invisível", mas conta como visível
+        v.style.pointerEvents = "none";
+        v.style.zIndex = "0";
+        document.body.appendChild(v);
+        videoKeepAlive = v;
+
+        try { v.load(); } catch (e) {}
+        try {
+            var p = v.play();
+            if (p && p.catch) p.catch(function () {});
+        } catch (e) {}
+    }
+
+    function pararManterAcordada() {
+        if (videoKeepAlive) {
+            destruirVideo(videoKeepAlive);
+            videoKeepAlive = null;
+        }
+    }
+
+    // ao voltar do segundo plano, pede o wake lock de novo
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") {
+            wakeLock = null;
+            pedirWakeLock();
+        }
+    });
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () { carregarPainel(true); });
+    } else {
+        carregarPainel(true);
+    }
+
+</script>
+
+</body>
+
+</html>

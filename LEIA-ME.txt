@@ -1,0 +1,66 @@
+﻿PAINEL DE AVISOS - VALORIZAÇÃO
+==============================
+
+ESTRUTURA DA PASTA
+Avisos\
+  app.py                   servidor Flask
+  leitor_messenger.py      lê a aba Pendentes do Messenger para o card de atendimento
+  instalar.bat             instala as bibliotecas (rodar 1 vez)
+  login_messenger.bat      faz o login no Messenger (rodar 1 vez / quando expirar)
+  config.ini               onde ficam a planilha e as mídias (pode ser na rede)
+  iniciar_painel.bat       duplo clique para ligar o painel
+  converter_videos.bat     deixa qualquer vídeo novo compatível com a TV
+  dados\avisos.xlsx        planilha (abas Avisos, Salas, Configurações)
+  static\avisos\          logo, imagens e vídeos
+  templates\index.html     a página do painel
+
+POR QUE O VÍDEO NÃO PASSAVA NA TV
+1. video1.mp4 era 4K (3840x2160, H.264 High 5.1). O navegador das Smart TVs
+   não decodifica 4K -> tela preta. Foi convertido para 1920x1080 (121 MB -> 16 MB).
+2. video2.mp4 tinha o índice (moov) no FINAL do arquivo. A TV precisaria baixar
+   tudo antes de começar. Foi convertido com "faststart".
+3. A página criava todos os <video> ao mesmo tempo com preload. TVs têm um só
+   decodificador de vídeo. Agora só existe 1 vídeo por vez na tela.
+4. Blur/filter no slide deixavam o vídeo preto em TVs. Removidos.
+5. Se o autoplay fosse bloqueado, o carrossel parava para sempre.
+   Agora ele pula para o próximo aviso depois de alguns segundos.
+6. O servidor rodava com debug=True (reinicia sozinho e corta o vídeo).
+   Agora roda com debug=False e threaded=True.
+
+VÍDEOS NOVOS
+Coloque o vídeo em static\avisos, rode converter_videos.bat e cadastre o nome
+na planilha. O app.py avisa no console se algum vídeo não estiver pronto para TV.
+
+DIAGNÓSTICO NA TV
+Abra na TV:  http://IP-DO-PC:5000/?debug=1
+Aparece uma caixa no canto mostrando se o vídeo carregou, tocou ou deu erro.
+
+FIREWALL
+Se a TV não abrir a página, libere a porta 5000 no Firewall do Windows
+para a rede privada.
+
+PLANILHA COMPARTILHADA (sem expor o código)
+1. No servidor da rede, crie uma pasta, ex.: \\SERVIDOR\Painel de Avisos
+   com a planilha avisos.xlsx e uma subpasta "midia" (imagens e vídeos).
+2. Dê permissão de Modificar nessa pasta só para quem vai editar os avisos.
+3. No config.ini (no PC do painel), preencha:
+     planilha = \\SERVIDOR\Painel de Avisos\avisos.xlsx
+     midia    = \\SERVIDOR\Painel de Avisos\midia
+4. A pasta Avisos (código) fica só no PC do painel e NÃO é compartilhada.
+O painel lê uma cópia da planilha: não trava o arquivo e, se ele estiver
+sendo salvo, mantém os dados anteriores na tela até conseguir ler.
+
+CARD DE ATENDIMENTO (MESSENGER EM TEMPO REAL)
+1. Rode instalar.bat (uma vez).
+2. Rode login_messenger.bat: abre o Google Chrome no login do Onvio.
+   Entre com usuário e senha, abra o Messenger pelo menu do Onvio e,
+   quando aparecer a aba Pendentes, FECHE o Chrome. O programa confere
+   a sessão sozinho.
+   A SENHA NÃO É SALVA - só a sessão, na pasta "perfil_messenger".
+   Essa pasta dá acesso ao Messenger: não copie nem compartilhe.
+3. Rode iniciar_painel.bat (ele abre o leitor minimizado + o painel).
+Se a TV mostrar "Login do Messenger expirou", feche o painel e rode
+o login_messenger.bat de novo.
+Ajustes no config.ini, seção [messenger]:
+  exibir_nomes = sim / primeiro_nome / nao
+  ativo = nao  -> esconde o card

@@ -1,0 +1,5 @@
+# Sessão do navegador do Messenger (contém o login, nunca versionar)
+perfil_messenger/
+__pycache__/
+*.pyc
+.venv/
